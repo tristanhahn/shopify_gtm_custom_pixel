@@ -1,6 +1,13 @@
 var GTM_LOADED=0;
 
 function loadGTM(){
+  window.dataLayer = window.dataLayer || [];
+  
+  window.dataLayer.push({
+	event: 'gtm_checkout_init',
+	gtm_loaded_from: 'custom_pixel'
+  });
+   
   (function(w, d, s, l, i) {
 	w[l] = w[l] || [];
 	w[l].push({
@@ -13,26 +20,45 @@ function loadGTM(){
 	j.async = true;
 	j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
 	f.parentNode.insertBefore(j, f);
-  })(window, document, 'script', 'dataLayer', 'GTM-XXXXXX');
+  })(window, document, 'script', 'dataLayer', 'GTM-XXXXX');
+  
   GTM_LOADED = 1;
+  
 }
 
 function pushToDataLayer(eventType, eventDetails, ecommerceDetails, customerDetails, pageDetails) {
     window.dataLayer = window.dataLayer || [];
-      
-    if(GTM_LOADED == 0){
-			loadGTM();
-	}
   
     window.dataLayer.push({
         event: eventType,
         ...eventDetails,
         ecommerce: ecommerceDetails,
         customer: customerDetails,
-        fired_from: "custom_pixel",
+        fired_from: 'custom_pixel',
         page_details: pageDetails
     });
     console.log(window.dataLayer);
+}
+
+	
+function sendToParent(eventType, eventDetails, ecommerceDetails, customerDetails, pageDetails) {
+
+   event_data = {
+        event: eventType,
+        ...eventDetails,
+        ecommerce: ecommerceDetails,
+        customer: customerDetails,
+        fired_from: 'custom_pixel',
+        page_details: pageDetails
+    };
+    console.log(event_data);
+    event_data_json = JSON.stringify(event_data);
+    console.log(event_data_json);
+    
+    parent.postMessage({
+		'event_name': 'gtm_custom_pixel_event', 
+		'json': event_data_json 
+	}, pageDetails.page_origin);
 }
 
 const commonCustomerDetails = (event, init) => ({
@@ -50,22 +76,14 @@ var pageDetails = (context) => ({
     page_url: context.document.location?.href ?? undefined,
     page_title: context.document?.title ?? undefined,
     page_referrer: context.document?.referrer ? context.document.referrer : undefined,
+    page_origin: context.document?.location.origin ? context.document.location.origin : undefined,
 });
 
-analytics.subscribe("page_viewed", (event) => {
-    pushToDataLayer("gtm_page_view", {
-        event_id: event.id,
-        event_category: "page_view",
-        event_timestamp: event.timestamp
-    }, 
-    {}, commonCustomerDetails(event, init), pageDetails(event.context)
-    );
-});
 
-analytics.subscribe("collection_viewed", (event) => {
-    pushToDataLayer("gtm_view_item_list", {
+analytics.subscribe('collection_viewed', async (event) => {
+    sendToParent('gtm_view_item_list', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.collection.productVariants[0].price.currencyCode,
@@ -74,7 +92,7 @@ analytics.subscribe("collection_viewed", (event) => {
         items: event.data.collection.productVariants.map((item, index) => ({
             item_brand: item.product.vendor,
             item_category: item.product.type,
-            item_id: item.sku === "" ? item.id : item.sku,
+            item_id: item.sku === '' ? item.id : item.sku,
             image: item.image.src,
             variant_id: item.id,
             variant: item.title,
@@ -87,20 +105,20 @@ analytics.subscribe("collection_viewed", (event) => {
     );
 });
 
-analytics.subscribe("search_submitted", (event,init) => {
-    pushToDataLayer("gtm_view_search_result", {
+analytics.subscribe('search_submitted', async (event,init) => {
+    sendToParent('gtm_view_search_result', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp,
         search_term: event.data.searchResult.query
     }, {
         currency: event.data.searchResult.productVariants[0].price.currencyCode,
-        item_list_name: "search_result",
-        item_list_id: "search_result",
+        item_list_name: 'search_result',
+        item_list_id: 'search_result',
         items: event.data.searchResult.productVariants.map((item, index) => ({
             item_brand: item.product.vendor,
             item_category: item.product.type,         
-            item_id: item.sku === "" ? item.id : item.sku,
+            item_id: item.sku === '' ? item.id : item.sku,
             image: item.image.src,
             variant_id: item.id,
             variant: item.title,
@@ -113,11 +131,11 @@ analytics.subscribe("search_submitted", (event,init) => {
     );
 });
 
-analytics.subscribe("product_viewed", (event) => {
+analytics.subscribe('product_viewed', async (event) => {
   console.log(event.data);
-    pushToDataLayer("gtm_view_item", {
+    sendToParent('gtm_view_item', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.productVariant.price.currencyCode,
@@ -125,7 +143,7 @@ analytics.subscribe("product_viewed", (event) => {
         items: [{
             item_category: event.data.productVariant.product.type,
             item_brand: event.data.productVariant.product.vendor,
-            item_id: event.data.productVariant.sku === "" ? event.data.productVariant.id : event.data.productVariant.sku,
+            item_id: event.data.productVariant.sku === '' ? event.data.productVariant.id : event.data.productVariant.sku,
             image: event.data.productVariant.image.src,
             variant_id: event.data.productVariant.id,
             variant: event.data.productVariant.title,
@@ -137,10 +155,10 @@ analytics.subscribe("product_viewed", (event) => {
     );
 });
 
-analytics.subscribe("product_added_to_cart", (event) => {
-    pushToDataLayer("gtm_add_to_cart", {
+analytics.subscribe('product_added_to_cart', async (event) => {
+    sendToParent('gtm_add_to_cart', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.cartLine.merchandise.price.currencyCode,
@@ -148,7 +166,7 @@ analytics.subscribe("product_added_to_cart", (event) => {
         items: [{
             item_category: event.data.cartLine.merchandise.product.type,
             item_brand: event.data.cartLine.merchandise.product.vendor,
-            item_id: event.data.cartLine.merchandise.sku === "" ? event.data.cartLine.merchandise.id : event.data.cartLine.merchandise.sku,
+            item_id: event.data.cartLine.merchandise.sku === '' ? event.data.cartLine.merchandise.id : event.data.cartLine.merchandise.sku,
             image: event.data.cartLine.merchandise.image.src,
             variant_id: event.data.cartLine.merchandise.id,
             variant: event.data.cartLine.merchandise.title,
@@ -161,10 +179,10 @@ analytics.subscribe("product_added_to_cart", (event) => {
     );
 });
 
-analytics.subscribe("product_removed_from_cart", (event) => {
-    pushToDataLayer("gtm_remove_from_cart", {
+analytics.subscribe('product_removed_from_cart', async (event) => {
+    sendToParent('gtm_remove_from_cart', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.cartLine.merchandise.price.currencyCode,
@@ -172,7 +190,7 @@ analytics.subscribe("product_removed_from_cart", (event) => {
         items: [{
             item_category: event.data.cartLine.merchandise.product.type,
             item_brand: event.data.cartLine.merchandise.product.vendor,
-            item_id: event.data.cartLine.merchandise.sku === "" ? event.data.cartLine.merchandise.id : event.data.cartLine.merchandise.sku,
+            item_id: event.data.cartLine.merchandise.sku === '' ? event.data.cartLine.merchandise.id : event.data.cartLine.merchandise.sku,
             image: event.data.cartLine.merchandise.image.src,
             variant_id: event.data.cartLine.merchandise.id,
             variant: event.data.cartLine.merchandise.title,
@@ -185,10 +203,15 @@ analytics.subscribe("product_removed_from_cart", (event) => {
     );
 });
 
-analytics.subscribe("checkout_started", (event) => {
-    pushToDataLayer("gtm_begin_checkout", {
+analytics.subscribe('checkout_started', (event) => {
+
+	if(GTM_LOADED == 0){
+			loadGTM();
+	}
+	
+    pushToDataLayer('gtm_begin_checkout', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.checkout.currencyCode,
@@ -200,7 +223,7 @@ analytics.subscribe("checkout_started", (event) => {
         coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
-            item_id: item.variant.sku === "" ? item.variant.id : item.variant.sku,
+            item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
@@ -230,12 +253,17 @@ analytics.subscribe("checkout_started", (event) => {
     );
 });
 
-analytics.subscribe("checkout_completed", (event) => {
+analytics.subscribe('checkout_completed', (event) => {
     console.log(event.data);
     console.log(event.context);
-    pushToDataLayer("gtm_purchase", {
+    
+    if(GTM_LOADED == 0){
+			loadGTM();
+	}
+	
+    pushToDataLayer('gtm_purchase', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.checkout.currencyCode,
@@ -251,7 +279,7 @@ analytics.subscribe("checkout_completed", (event) => {
         payment_method: event.data.checkout.transactions[0].paymentMethod?.type,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
-            item_id: item.variant.sku === "" ? item.variant.id : item.variant.sku,
+            item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
@@ -281,10 +309,15 @@ analytics.subscribe("checkout_completed", (event) => {
     );
 });
 
-analytics.subscribe("payment_info_submitted", (event) => {
-    pushToDataLayer("gtm_add_payment_info", {
+analytics.subscribe('payment_info_submitted', (event) => {
+	
+	if(GTM_LOADED == 0){
+			loadGTM();
+	}
+	
+    pushToDataLayer('gtm_add_payment_info', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.checkout.currencyCode,
@@ -296,7 +329,7 @@ analytics.subscribe("payment_info_submitted", (event) => {
         coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
-            item_id: item.variant.sku === "" ? item.variant.id : item.variant.sku,
+            item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
@@ -326,10 +359,15 @@ analytics.subscribe("payment_info_submitted", (event) => {
     );
 });
 
-analytics.subscribe("checkout_contact_info_submitted", (event) => {
-    pushToDataLayer("gtm_contact_info", {
+analytics.subscribe('checkout_contact_info_submitted', (event) => {
+
+	if(GTM_LOADED == 0){
+			loadGTM();
+	}
+	
+    pushToDataLayer('gtm_contact_info', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.checkout.currencyCode,
@@ -341,7 +379,7 @@ analytics.subscribe("checkout_contact_info_submitted", (event) => {
         coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
-            item_id: item.variant.sku === "" ? item.variant.id : item.variant.sku,
+            item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
@@ -371,10 +409,15 @@ analytics.subscribe("checkout_contact_info_submitted", (event) => {
     );
 });
 
-analytics.subscribe("checkout_address_info_submitted", (event) => {
-    pushToDataLayer("gtm_add_shipping_info", {
+analytics.subscribe('checkout_address_info_submitted', (event) => {
+	
+	if(GTM_LOADED == 0){
+			loadGTM();
+	}
+	
+    pushToDataLayer('gtm_add_shipping_info', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.checkout.currencyCode,
@@ -386,7 +429,7 @@ analytics.subscribe("checkout_address_info_submitted", (event) => {
         coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
-            item_id: item.variant.sku === "" ? item.variant.id : item.variant.sku,
+            item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
@@ -416,10 +459,10 @@ analytics.subscribe("checkout_address_info_submitted", (event) => {
     );
 });
 
-analytics.subscribe("cart_viewed", (event) => {
-    pushToDataLayer("gtm_view_cart", {
+analytics.subscribe('cart_viewed', async (event) => {
+    sendToParent('gtm_view_cart', {
         event_id: event.id,
-        event_category: "ecommerce",
+        event_category: 'ecommerce',
         event_timestamp: event.timestamp
     }, {
         currency: event.data.cart.cost.totalAmount.currencyCode,
@@ -428,7 +471,7 @@ analytics.subscribe("cart_viewed", (event) => {
         items: event.data.cart.lines.map(item => ({
             item_brand: item.merchandise.product.vendor,
             item_category: item.merchandise.product.type,
-            item_id: item.merchandise.sku === "" ? item.merchandise.id : item.merchandise.sku,
+            item_id: item.merchandise.sku === '' ? item.merchandise.id : item.merchandise.sku,
             image: item.merchandise.image.src,
             variant_id: item.merchandise.id,
             variant: item.merchandise.title,
