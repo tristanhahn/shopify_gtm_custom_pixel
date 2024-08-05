@@ -37,7 +37,6 @@ function pushToDataLayer(eventType, eventDetails, ecommerceDetails, customerDeta
     fired_from: 'custom_pixel',
     page_details: pageDetails
   });
-  console.log(window.dataLayer);
 }
 
 function sendToParent(eventType, eventDetails, ecommerceDetails, customerDetails, pageDetails) {
@@ -49,9 +48,6 @@ function sendToParent(eventType, eventDetails, ecommerceDetails, customerDetails
     fired_from: 'custom_pixel',
     page_details: pageDetails
   };
-  console.log(event_data);
-  event_data_json = JSON.stringify(event_data);
-  console.log(event_data_json);
 
   parent.postMessage({
     'event_name': 'gtm_custom_pixel_event', 
@@ -127,7 +123,6 @@ analytics.subscribe('search_submitted', async (event, init) => {
 });
 
 analytics.subscribe('product_viewed', async (event) => {
-  console.log(event.data);
   sendToParent('gtm_view_item', {
     event_id: event.id,
     event_category: 'ecommerce',
@@ -268,8 +263,6 @@ analytics.subscribe('checkout_started', (event) => {
 });
 
 analytics.subscribe('checkout_completed', (event) => {
-  console.log(event.data);
-  console.log(event.context);
 
   if (GTM_LOADED == 0) {
     loadGTM();
