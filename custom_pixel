@@ -51,7 +51,7 @@ function sendToParent(eventType, eventDetails, ecommerceDetails, customerDetails
 
   parent.postMessage({
     'event_name': 'gtm_custom_pixel_event', 
-    'json': JSON.parse(event_data_json) 
+    'json': JSON.parse(event_data) 
   }, pageDetails.page_origin);
 }
 
