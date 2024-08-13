@@ -293,7 +293,7 @@ analytics.subscribe('checkout_completed', (event) => {
         discount_amount:event.data.checkout.discountsAmount.amount,
         checkout_token: event.data.checkout.token,
         coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
-        payment_method: event.data.checkout.transactions[0].paymentMethod?.type,
+        payment_method: event.data.checkout.transactions[0]?.paymentMethod.type ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
