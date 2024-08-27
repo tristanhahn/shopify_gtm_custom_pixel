@@ -290,10 +290,10 @@ analytics.subscribe('checkout_completed', (event) => {
         net_value: parseFloat(event.data.checkout.totalPrice.amount)-parseFloat(event.data.checkout.totalTax.amount), 
         shipping: event.data.checkout.shippingLine.price.amount,
         sub_total: event.data.checkout.subtotalPrice.amount,
-        discount_amount:event.data.checkout.discountsAmount.amount,
+        discount_amount:event.data.checkout?.discountsAmount?.amount ?? undefined,
         checkout_token: event.data.checkout.token,
-        coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
-        payment_method: event.data.checkout.transactions[0]?.paymentMethod.type ?? undefined,
+        coupon: event.data.checkout?.discountApplications?.[0]?.title ?? undefined,
+        payment_method: event.data.checkout?.transactions?.[0]?.paymentMethod?.type ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
@@ -304,8 +304,8 @@ analytics.subscribe('checkout_completed', (event) => {
             item_name: item.title,
             quantity: item.quantity,
             price: item.variant.price.amount,
-            coupon: (item.discountAllocations && item.discountAllocations.length > 0) ? item.discountAllocations[0].discountApplication.title : undefined,
-            discount: (item.discountAllocations && item.discountAllocations.length > 0) ? item.discountAllocations[0].amount.amount : undefined,
+            coupon: (item.discountAllocations && item.discountAllocations.length > 0) ? item?.discountAllocations[0]?.discountApplication?.title : undefined,
+            discount: (item.discountAllocations && item.discountAllocations.length > 0) ? item?.discountAllocations[0]?.amount?.amount : undefined,
         }))
     },{
 		id: event.data.checkout.order.customer?.id ?? undefined,
