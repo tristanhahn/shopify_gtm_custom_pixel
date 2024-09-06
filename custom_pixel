@@ -37,6 +37,7 @@ function pushToDataLayer(eventType, eventDetails, ecommerceDetails, customerDeta
         fired_from: 'custom_pixel',
         page_details: pageDetails
     });
+    console.log(window.dataLayer);
 }
 
 	
@@ -73,6 +74,14 @@ var pageDetails = (context) => ({
     page_title: context.document?.title ?? undefined,
     page_referrer: context.document?.referrer ? context.document.referrer : undefined,
     page_origin: context.document?.location.origin ? context.document.location.origin : undefined,
+});
+
+analytics.subscribe('page_viewed', (event) => {
+    sendToParent('gtm_page_viewd', {
+        event_id: event.id,
+    }, {
+    }, commonCustomerDetails(event, init), pageDetails(event.context)
+    );
 });
 
 
@@ -128,6 +137,8 @@ analytics.subscribe('search_submitted', (event,init) => {
 });
 
 analytics.subscribe('product_viewed', (event) => {
+  console.log(event.data);
+  console.log(init.customerPrivacy.marketingAllowed);
     sendToParent('gtm_view_item', {
         event_id: event.id,
         event_category: 'ecommerce',
@@ -243,6 +254,7 @@ analytics.subscribe('checkout_started', (event) => {
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
+            item_category: item.variant?.product?.type ?? undefined,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
@@ -273,6 +285,8 @@ analytics.subscribe('checkout_started', (event) => {
 });
 
 analytics.subscribe('checkout_completed', (event) => {
+    console.log(event.data);
+    console.log(event.context);
     
     if(GTM_LOADED == 0){
 			loadGTM();
@@ -297,6 +311,7 @@ analytics.subscribe('checkout_completed', (event) => {
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
+            item_category: item.variant?.product?.type ?? undefined,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
@@ -304,8 +319,8 @@ analytics.subscribe('checkout_completed', (event) => {
             item_name: item.title,
             quantity: item.quantity,
             price: item.variant.price.amount,
-            coupon: (item.discountAllocations && item.discountAllocations.length > 0) ? item?.discountAllocations[0]?.discountApplication?.title : undefined,
-            discount: (item.discountAllocations && item.discountAllocations.length > 0) ? item?.discountAllocations[0]?.amount?.amount : undefined,
+            coupon: (item.discountAllocations && item.discountAllocations.length > 0) ? item.discountAllocations[0].discountApplication.title : undefined,
+            discount: (item.discountAllocations && item.discountAllocations.length > 0) ? item.discountAllocations[0].amount.amount : undefined,
         }))
     },{
 		id: event.data.checkout.order.customer?.id ?? undefined,
@@ -324,6 +339,7 @@ analytics.subscribe('checkout_completed', (event) => {
 		orders_count: event.data.checkout.order.customer?.ordersCount ?? undefined,
     }, pageDetails(event.context)
     );
+  console.log(event.data)
 });
 
 analytics.subscribe('payment_info_submitted', (event) => {
@@ -347,6 +363,7 @@ analytics.subscribe('payment_info_submitted', (event) => {
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
+            item_category: item.variant?.product?.type ?? undefined,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
@@ -397,6 +414,7 @@ analytics.subscribe('checkout_contact_info_submitted', (event) => {
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
+            item_category: item.variant?.product?.type ?? undefined,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
@@ -447,6 +465,7 @@ analytics.subscribe('checkout_address_info_submitted', (event) => {
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
+            item_category: item.variant?.product?.type ?? undefined,
             image: item.variant.image.src,
             variant_id: item.variant.id,
             variant: item.variant.title,
