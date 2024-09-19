@@ -20,7 +20,7 @@ function loadGTM(){
 	j.async = true;
 	j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
 	f.parentNode.insertBefore(j, f);
-  })(window, document, 'script', 'dataLayer', 'GTM-XXXX');
+  })(window, document, 'script', 'dataLayer', 'GTM-NPWD6928');
   
   GTM_LOADED = 1;
   
@@ -336,7 +336,7 @@ analytics.subscribe('checkout_completed', (event) => {
 		province: event.data.checkout.shippingAddress?.province ?? undefined,
 		province_code: event.data.checkout.shippingAddress?.provinceCode ?? undefined,
 		zip: event.data.checkout.shippingAddress?.zip ?? undefined,
-		orders_count: event.data.checkout.order.customer?.ordersCount ?? undefined,
+		is_first_order: event.data.checkout.order.customer?.isFirstOrder ?? undefined,
     }, pageDetails(event.context)
     );
   console.log(event.data)
