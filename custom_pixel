@@ -1,3 +1,19 @@
+let customerPrivacyStatus = init.customerPrivacy;
+
+api.customerPrivacy.subscribe('visitorConsentCollected', (event) => {
+  customerPrivacyStatus = event.customerPrivacy;
+  var event_details = {
+      event:"shopify_consent",
+      consent_marketing: customerPrivacyStatus.marketingAllowed,
+      consent_analytics: customerPrivacyStatus.analyticsProcessingAllowed,
+      consent_preferences: customerPrivacyStatus.preferencesProcessingAllowed,
+  };
+  parent.postMessage({
+      'event_name': 'gtm_custom_pixel_event', 
+      'json': JSON.stringify({ ...event_details}) 
+  }, init.context.document.location.origin);
+});
+
 var GTM_LOADED=0;
 
 function loadGTM(){
@@ -20,7 +36,7 @@ function loadGTM(){
 	j.async = true;
 	j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
 	f.parentNode.insertBefore(j, f);
-  })(window, document, 'script', 'dataLayer', 'GTM-NPWD6928');
+  })(window, document, 'script', 'dataLayer', 'GTM-XXXX');
   
   GTM_LOADED = 1;
   
@@ -37,9 +53,7 @@ function pushToDataLayer(eventType, eventDetails, ecommerceDetails, customerDeta
         fired_from: 'custom_pixel',
         page_details: pageDetails
     });
-    console.log(window.dataLayer);
 }
-
 	
 function sendToParent(eventType, eventDetails, ecommerceDetails, customerDetails, pageDetails) {
 
@@ -76,8 +90,9 @@ var pageDetails = (context) => ({
     page_origin: context.document?.location.origin ? context.document.location.origin : undefined,
 });
 
+
 analytics.subscribe('page_viewed', (event) => {
-    sendToParent('gtm_page_viewd', {
+    sendToParent('gtm_page_viewed', {
         event_id: event.id,
     }, {
     }, commonCustomerDetails(event, init), pageDetails(event.context)
@@ -137,8 +152,6 @@ analytics.subscribe('search_submitted', (event,init) => {
 });
 
 analytics.subscribe('product_viewed', (event) => {
-  console.log(event.data);
-  console.log(init.customerPrivacy.marketingAllowed);
     sendToParent('gtm_view_item', {
         event_id: event.id,
         event_category: 'ecommerce',
@@ -250,7 +263,7 @@ analytics.subscribe('checkout_started', (event) => {
         shipping: event.data.checkout.shippingLine.price.amount,
         sub_total: event.data.checkout.subtotalPrice.amount,
         checkout_token: event.data.checkout.token,
-        coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
+        coupon: event.data.checkout.discountApplications?.find(app => app.type === "DISCOUNT_CODE")?.title ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
@@ -285,9 +298,6 @@ analytics.subscribe('checkout_started', (event) => {
 });
 
 analytics.subscribe('checkout_completed', (event) => {
-    console.log(event.data);
-    console.log(event.context);
-    
     if(GTM_LOADED == 0){
 			loadGTM();
 	}
@@ -306,7 +316,7 @@ analytics.subscribe('checkout_completed', (event) => {
         sub_total: event.data.checkout.subtotalPrice.amount,
         discount_amount:event.data.checkout?.discountsAmount?.amount ?? undefined,
         checkout_token: event.data.checkout.token,
-        coupon: event.data.checkout?.discountApplications?.[0]?.title ?? undefined,
+        coupon: event.data.checkout.discountApplications?.find(app => app.type === "DISCOUNT_CODE")?.title ?? undefined,
         payment_method: event.data.checkout?.transactions?.[0]?.paymentMethod?.type ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
@@ -339,7 +349,6 @@ analytics.subscribe('checkout_completed', (event) => {
 		is_first_order: event.data.checkout.order.customer?.isFirstOrder ?? undefined,
     }, pageDetails(event.context)
     );
-  console.log(event.data)
 });
 
 analytics.subscribe('payment_info_submitted', (event) => {
@@ -359,7 +368,7 @@ analytics.subscribe('payment_info_submitted', (event) => {
         shipping: event.data.checkout.shippingLine.price.amount,
         sub_total: event.data.checkout.subtotalPrice.amount,
         checkout_token: event.data.checkout.token,
-        coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
+        coupon: event.data.checkout.discountApplications?.find(app => app.type === "DISCOUNT_CODE")?.title ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
@@ -410,7 +419,7 @@ analytics.subscribe('checkout_contact_info_submitted', (event) => {
         shipping: event.data.checkout.shippingLine.price.amount,
         sub_total: event.data.checkout.subtotalPrice.amount,
         checkout_token: event.data.checkout.token,
-        coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
+        coupon: event.data.checkout.discountApplications?.find(app => app.type === "DISCOUNT_CODE")?.title ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
@@ -461,7 +470,7 @@ analytics.subscribe('checkout_address_info_submitted', (event) => {
         shipping: event.data.checkout.shippingLine.price.amount,
         sub_total: event.data.checkout.subtotalPrice.amount,
         checkout_token: event.data.checkout.token,
-        coupon: event.data.checkout.discountApplications[0]?.title ?? undefined,
+        coupon: event.data.checkout.discountApplications?.find(app => app.type === "DISCOUNT_CODE")?.title ?? undefined,
         items: event.data.checkout.lineItems.map(item => ({
             item_brand: item.variant.product.vendor,
             item_id: item.variant.sku === '' ? item.variant.id : item.variant.sku,
