@@ -90,6 +90,7 @@ const commonCustomerDetails = (event, init) => ({
 
 var pageDetails = (context) => ({
     page_url: context.document.location?.href ?? undefined,
+    store_front_url: init.data.shop.storefrontUrl,
     page_title: context.document?.title ?? undefined,
     page_referrer: context.document?.referrer ? context.document.referrer : undefined,
     page_origin: context.document?.location.origin ? context.document.location.origin : undefined,
