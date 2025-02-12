@@ -17,7 +17,6 @@
              const event_data = JSON.parse(event.data.json);
              console.log(event_data.ecommerce);
        
-             // Check if ecommerce exists and is not an empty object
              if (event_data.ecommerce && Object.keys(event_data.ecommerce).length > 0) {
                window.dataLayer.push({ ecommerce: null });
              }
