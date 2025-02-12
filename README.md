@@ -7,30 +7,29 @@
    - Add the following script immediately after the opening `<head>` tag:
 
      ```html
-    <!--Event Listener for dataLayer Events from Custom Pixel-->
-    <script>
-    function handleCustomPixelEvent(event) {
-      if (event.data.event_name === "gtm_custom_pixel_event" && event.data.json) {
-        window.dataLayer = window.dataLayer || []; // Proper initialization
-    
-        try {
-          const event_data = JSON.parse(event.data.json);
-          console.log(event_data.ecommerce);
-    
-          // Check if ecommerce exists and is not an empty object
-          if (event_data.ecommerce && Object.keys(event_data.ecommerce).length > 0) {
-            window.dataLayer.push({ ecommerce: null });
-          }
-    
-          window.dataLayer.push(event_data);
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-        }
-      }
-    }
-      
-    window.addEventListener('message', handleCustomPixelEvent); 
-    </script> 
+       <!--Event Listener for dataLayer Events from Custom Pixel-->
+       <script>
+       function handleCustomPixelEvent(event) {
+         if (event.data.event_name === "gtm_custom_pixel_event" && event.data.json) {
+           window.dataLayer = window.dataLayer || []; // Proper initialization
+       
+           try {
+             const event_data = JSON.parse(event.data.json);
+             console.log(event_data.ecommerce);
+       
+             // Check if ecommerce exists and is not an empty object
+             if (event_data.ecommerce && Object.keys(event_data.ecommerce).length > 0) {
+               window.dataLayer.push({ ecommerce: null });
+             }
+       
+             window.dataLayer.push(event_data);
+           } catch (error) {
+             console.error("Error parsing JSON:", error);
+           }
+         }
+       }   
+       window.addEventListener('message', handleCustomPixelEvent); 
+       </script>  
      ```
 
 3. **Replace GTM Container Placeholder:**
