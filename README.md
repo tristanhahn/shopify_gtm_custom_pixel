@@ -11,7 +11,7 @@
        <script>
        function handleCustomPixelEvent(event) {
          if (event.data.event_name === "gtm_custom_pixel_event" && event.data.json) {
-           window.dataLayer = window.dataLayer || []; // Proper initialization
+           window.dataLayer = window.dataLayer || [];
        
            try {
              const event_data = JSON.parse(event.data.json);
