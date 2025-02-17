@@ -117,7 +117,7 @@ analytics.subscribe('collection_viewed', (event) => {
     items: (event?.data?.collection?.productVariants ?? []).map((item, index) => ({
       item_brand: item?.product?.vendor ?? undefined,
       item_category: item?.product?.type ?? undefined,
-      item_id: item?.sku === '' ? item?.id : item?.sku,
+      item_id: item?.sku === '' || item?.sku == null  ? item?.id : item?.sku,
       image: item?.image?.src ?? undefined,
       variant_id: item?.id ?? undefined,
       variant: item?.title ?? undefined,
@@ -142,7 +142,7 @@ analytics.subscribe('search_submitted', (event) => {
     items: (event?.data?.searchResult?.productVariants ?? []).map((item, index) => ({
       item_brand: item?.product?.vendor ?? undefined,
       item_category: item?.product?.type ?? undefined,
-      item_id: item?.sku === '' ? item?.id : item?.sku,
+      item_id: item?.sku === '' || item?.sku == null  ? item?.id : item?.sku,
       image: item?.image?.src ?? undefined,
       variant_id: item?.id ?? undefined,
       variant: item?.title ?? undefined,
@@ -165,7 +165,7 @@ analytics.subscribe('product_viewed', (event) => {
     items: [{
       item_category: event?.data?.productVariant?.product?.type ?? undefined,
       item_brand: event?.data?.productVariant?.product?.vendor ?? undefined,
-      item_id: event?.data?.productVariant?.sku === '' ? event?.data?.productVariant?.id : event?.data?.productVariant?.sku,
+      item_id: event?.data?.productVariant?.sku === '' || event?.data?.productVariant?.sku == null ? event?.data?.productVariant?.id : event?.data?.productVariant?.sku,
       image: event?.data?.productVariant?.image?.src ?? undefined,
       variant_id: event?.data?.productVariant?.id ?? undefined,
       variant: event?.data?.productVariant?.title ?? undefined,
@@ -187,7 +187,7 @@ analytics.subscribe('product_added_to_cart', (event) => {
     items: [{
       item_category: event?.data?.cartLine?.merchandise?.product?.type ?? undefined,
       item_brand: event?.data?.cartLine?.merchandise?.product?.vendor ?? undefined,
-      item_id: event?.data?.cartLine?.merchandise?.sku === '' ? event?.data?.cartLine?.merchandise?.id : event?.data?.cartLine?.merchandise?.sku,
+      item_id: event?.data?.cartLine?.merchandise?.sku === '' || event?.data?.cartLine?.merchandise?.sku == null ? event?.data?.cartLine?.merchandise?.id : event?.data?.cartLine?.merchandise?.sku,
       image: event?.data?.cartLine?.merchandise?.image?.src ?? undefined,
       variant_id: event?.data?.cartLine?.merchandise?.id ?? undefined,
       variant: event?.data?.cartLine?.merchandise?.title ?? undefined,
@@ -210,7 +210,7 @@ analytics.subscribe('product_removed_from_cart', async (event) => {
     items: [{
       item_category: event?.data?.cartLine?.merchandise?.product?.type ?? undefined,
       item_brand: event?.data?.cartLine?.merchandise?.product?.vendor ?? undefined,
-      item_id: event?.data?.cartLine?.merchandise?.sku === '' ? event?.data?.cartLine?.merchandise?.id : event?.data?.cartLine?.merchandise?.sku,
+      item_id: event?.data?.cartLine?.merchandise?.sku === '' || event?.data?.cartLine?.merchandise?.sku == null ? event?.data?.cartLine?.merchandise?.id : event?.data?.cartLine?.merchandise?.sku,
       image: event?.data?.cartLine?.merchandise?.image?.src ?? undefined,
       variant_id: event?.data?.cartLine?.merchandise?.id ?? undefined,
       variant: event?.data?.cartLine?.merchandise?.title ?? undefined,
@@ -234,7 +234,7 @@ analytics.subscribe('cart_viewed', async (event) => {
     items: (event?.data?.cart?.lines ?? []).map(item => ({
       item_brand: item?.merchandise?.product?.vendor ?? undefined,
       item_category: item?.merchandise?.product?.type ?? undefined,
-      item_id: item?.merchandise?.sku === '' ? item?.merchandise?.id : item?.merchandise?.sku,
+      item_id: item?.merchandise?.sku === '' || item?.merchandise?.sku == null ? item?.merchandise?.id : item?.merchandise?.sku,
       image: item?.merchandise?.image?.src ?? undefined,
       variant_id: item?.merchandise?.id ?? undefined,
       variant: item?.merchandise?.title ?? undefined,
@@ -265,7 +265,7 @@ analytics.subscribe('checkout_started', (event) => {
     coupon: event?.data?.checkout?.discountApplications?.find(app => app?.type === "DISCOUNT_CODE")?.title ?? undefined,
     items: (event?.data?.checkout?.lineItems ?? []).map(item => ({
       item_brand: item?.variant?.product?.vendor ?? undefined,
-      item_id: item?.variant?.sku === '' ? item?.variant?.id : item?.variant?.sku,
+      item_id: item?.variant?.sku === '' || item?.variant?.sku == null ? item?.variant?.id : item?.variant?.sku,
       item_category: item?.variant?.product?.type ?? undefined,
       image: item?.variant?.image?.src ?? undefined,
       variant_id: item?.variant?.id ?? undefined,
@@ -318,7 +318,7 @@ analytics.subscribe('checkout_completed', (event) => {
     payment_method: event?.data?.checkout?.transactions?.[0]?.paymentMethod?.type ?? undefined,
     items: (event?.data?.checkout?.lineItems ?? []).map(item => ({
       item_brand: item?.variant?.product?.vendor ?? undefined,
-      item_id: item?.variant?.sku === '' ? item?.variant?.id : item?.variant?.sku,
+      item_id: item?.variant?.sku === '' || item?.variant?.sku == null ? item?.variant?.id : item?.variant?.sku,
       item_category: item?.variant?.product?.type ?? undefined,
       image: item?.variant?.image?.src ?? undefined,
       variant_id: item?.variant?.id ?? undefined,
@@ -368,7 +368,7 @@ analytics.subscribe('payment_info_submitted', (event) => {
     coupon: event?.data?.checkout?.discountApplications?.find(app => app?.type === "DISCOUNT_CODE")?.title ?? undefined,
     items: (event?.data?.checkout?.lineItems ?? []).map(item => ({
       item_brand: item?.variant?.product?.vendor ?? undefined,
-      item_id: item?.variant?.sku === '' ? item?.variant?.id : item?.variant?.sku,
+      item_id: item?.variant?.sku === '' || item?.variant?.sku == null ? item?.variant?.id : item?.variant?.sku,
       item_category: item?.variant?.product?.type ?? undefined,
       image: item?.variant?.image?.src ?? undefined,
       variant_id: item?.variant?.id ?? undefined,
@@ -417,7 +417,7 @@ analytics.subscribe('checkout_contact_info_submitted', (event) => {
     coupon: event?.data?.checkout?.discountApplications?.find(app => app?.type === "DISCOUNT_CODE")?.title ?? undefined,
     items: (event?.data?.checkout?.lineItems ?? []).map(item => ({
       item_brand: item?.variant?.product?.vendor ?? undefined,
-      item_id: item?.variant?.sku === '' ? item?.variant?.id : item?.variant?.sku,
+      item_id: item?.variant?.sku === ''  || item?.variant?.sku == null ? item?.variant?.id : item?.variant?.sku,
       item_category: item?.variant?.product?.type ?? undefined,
       image: item?.variant?.image?.src ?? undefined,
       variant_id: item?.variant?.id ?? undefined,
@@ -466,7 +466,7 @@ analytics.subscribe('checkout_shipping_info_submitted', (event) => {
     coupon: event?.data?.checkout?.discountApplications?.find(app => app?.type === "DISCOUNT_CODE")?.title ?? undefined,
     items: (event?.data?.checkout?.lineItems ?? []).map(item => ({
       item_brand: item?.variant?.product?.vendor ?? undefined,
-      item_id: item?.variant?.sku === '' ? item?.variant?.id : item?.variant?.sku,
+      item_id: item?.variant?.sku === ''  || item?.variant?.sku == null ? item?.variant?.id : item?.variant?.sku,
       item_category: item?.variant?.product?.type ?? undefined,
       image: item?.variant?.image?.src ?? undefined,
       variant_id: item?.variant?.id ?? undefined,
@@ -515,7 +515,7 @@ analytics.subscribe('checkout_address_info_submitted', (event) => {
     coupon: event?.data?.checkout?.discountApplications?.find(app => app?.type === "DISCOUNT_CODE")?.title ?? undefined,
     items: (event?.data?.checkout?.lineItems ?? []).map(item => ({
       item_brand: item?.variant?.product?.vendor ?? undefined,
-      item_id: item?.variant?.sku === '' ? item?.variant?.id : item?.variant?.sku,
+      item_id: item?.variant?.sku === '' || item?.variant?.sku == null ? item?.variant?.id : item?.variant?.sku,
       item_category: item?.variant?.product?.type ?? undefined,
       image: item?.variant?.image?.src ?? undefined,
       variant_id: item?.variant?.id ?? undefined,
