@@ -15,7 +15,6 @@
        
            try {
              const event_data = JSON.parse(event.data.json);
-             console.log(event_data.ecommerce);
        
              if (event_data.ecommerce && Object.keys(event_data.ecommerce).length > 0) {
                window.dataLayer.push({ ecommerce: null });
@@ -23,7 +22,7 @@
        
              window.dataLayer.push(event_data);
            } catch (error) {
-             console.error("Error parsing JSON:", error);
+             console.error("Error parsing dataLayer JSON:", error);
            }
          }
        }   
