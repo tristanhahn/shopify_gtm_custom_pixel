@@ -35,7 +35,8 @@
                   window.__customPixelListenerAttached = true;
               }
           })();
-         </script>```
+         </script>
+     ```
 
 3. **Replace GTM Container Placeholder:**
    - Replace the GTM Container placeholder in the custom pixel code with your GTM Container ID.
