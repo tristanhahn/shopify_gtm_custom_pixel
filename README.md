@@ -7,7 +7,7 @@
    - Add the following script immediately after the opening `<head>` tag:
 
      ```html
-       <!--Event Listener for dataLayer Events from Custom Pixel-->
+         <!--Event Listener for dataLayer Events from Custom Pixel-->
          <script>
           (function () {
               'use strict';
