@@ -1,7 +1,7 @@
 # Implementation Guide
 
 1. **Copy the Code:**
-   - Copy the code from [this GitHub repository](https://github.com/tristanhahn/shopify_gtm_custom_pixel/blob/main/custom_pixel) and paste it into a Shopify Custom Pixel.
+   - Copy the code from this GitHub repository and paste it into a Shopify Custom Pixel.
 
 2. **Add Event Listener Script:**
    - Add the following script immediately after the opening `<head>` tag:
