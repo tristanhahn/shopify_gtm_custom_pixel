@@ -5,6 +5,12 @@ https://github.com/tristanhahn/shopify_gtm_custom_pixel
 
 let customerPrivacyStatus = init?.customerPrivacy ?? undefined;
 
+window.dataLayer = [{
+	consent_marketing: customerPrivacyStatus?.marketingAllowed,
+	consent_analytics: customerPrivacyStatus?.analyticsProcessingAllowed,
+	consent_preferences: customerPrivacyStatus?.preferencesProcessingAllowed
+}];
+
 const gtm_id  = "GTM-XXXXX";
 
 api?.customerPrivacy?.subscribe('visitorConsentCollected', (event) => {
