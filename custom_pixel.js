@@ -8,7 +8,8 @@ let customerPrivacyStatus = init?.customerPrivacy ?? undefined;
 window.dataLayer = [{
 	consent_marketing: customerPrivacyStatus?.marketingAllowed,
 	consent_analytics: customerPrivacyStatus?.analyticsProcessingAllowed,
-	consent_preferences: customerPrivacyStatus?.preferencesProcessingAllowed
+	consent_preferences: customerPrivacyStatus?.preferencesProcessingAllowed,	 
+	gtm_loaded_from: 'custom_pixel'
 }];
 
 const gtm_id  = "GTM-XXXXX";
