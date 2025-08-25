@@ -107,14 +107,23 @@ var pageDetails = (context) => ({
 });
 
 analytics.subscribe('page_viewed', (event) => {
-  sendToParent('gtm_page_viewed', {
-    event_id: event?.id,
-  }, {}, commonCustomerDetails(event, init), pageDetails(event?.context));
+  if(init?.context?.document?.location?.href.indexOf('/checkouts/')!== -1){
+    if(GTM_LOADED === 0) {
+		loadGTM();
+	}
+    pushToDataLayer('gtm_page_viewed', {
+       event_id_page_view: event?.id,
+    }, {}, commonCustomerDetails(event, init), pageDetails(event?.context));
+  }
+  else{
+    sendToParent('gtm_page_viewed', {
+       event_id_page_view: event?.id,
+    }, {}, commonCustomerDetails(event, init), pageDetails(event?.context));
+  }
 });
-
 analytics.subscribe('collection_viewed', (event) => {
   sendToParent('gtm_view_item_list', {
-    event_id: event?.id,
+    event_id_view_item_list: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -138,7 +147,7 @@ analytics.subscribe('collection_viewed', (event) => {
 
 analytics.subscribe('search_submitted', (event) => {
   sendToParent('gtm_view_search_result', {
-    event_id: event?.id,
+    event_id_view_search_result: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp,
     search_term: event?.data?.searchResult?.query ?? undefined
@@ -163,7 +172,7 @@ analytics.subscribe('search_submitted', (event) => {
 
 analytics.subscribe('product_viewed', (event) => {
   sendToParent('gtm_view_item', {
-    event_id: event?.id,
+    event_id_view_item: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -184,31 +193,58 @@ analytics.subscribe('product_viewed', (event) => {
 });
 
 analytics.subscribe('product_added_to_cart', (event) => {
-  sendToParent('gtm_add_to_cart', {
-    event_id: event?.id,
-    event_category: 'ecommerce',
-    event_timestamp: event?.timestamp
-  }, {
-    currency: event?.data?.cartLine?.merchandise?.price?.currencyCode ?? undefined,
-    value: event?.data?.cartLine?.merchandise?.price?.amount ?? undefined,
-    items: [{
-      item_category: event?.data?.cartLine?.merchandise?.product?.type ?? undefined,
-      item_brand: event?.data?.cartLine?.merchandise?.product?.vendor ?? undefined,
-      item_id: event?.data?.cartLine?.merchandise?.sku === '' || event?.data?.cartLine?.merchandise?.sku == null ? event?.data?.cartLine?.merchandise?.id : event?.data?.cartLine?.merchandise?.sku,
-      image: event?.data?.cartLine?.merchandise?.image?.src ?? undefined,
-      variant_id: event?.data?.cartLine?.merchandise?.id ?? undefined,
-      variant: event?.data?.cartLine?.merchandise?.title ?? undefined,
-      product_id: event?.data?.cartLine?.merchandise?.product?.id ?? undefined,
-      item_name: event?.data?.cartLine?.merchandise?.product?.title ?? undefined,
-      price: event?.data?.cartLine?.merchandise?.price?.amount ?? undefined,
-      quantity: event?.data?.cartLine?.quantity ?? undefined
-    }]
-  }, commonCustomerDetails(event, init), pageDetails(event?.context));
-});
+  if(init?.context?.document?.location?.href.indexOf('/checkouts/')!== -1){
+	  if(GTM_LOADED === 0) {
+		loadGTM();
+	  }
+	  pushToDataLayer('gtm_add_to_cart', {
+		event_id_add_to_cart: event?.id,
+		event_category: 'ecommerce',
+		event_timestamp: event?.timestamp
+	  }, {
+		currency: event?.data?.cartLine?.merchandise?.price?.currencyCode ?? undefined,
+		value: event?.data?.cartLine?.merchandise?.price?.amount ?? undefined,
+		items: [{
+		  item_category: event?.data?.cartLine?.merchandise?.product?.type ?? undefined,
+		  item_brand: event?.data?.cartLine?.merchandise?.product?.vendor ?? undefined,
+		  item_id: event?.data?.cartLine?.merchandise?.sku === '' || event?.data?.cartLine?.merchandise?.sku == null ? event?.data?.cartLine?.merchandise?.id : event?.data?.cartLine?.merchandise?.sku,
+		  image: event?.data?.cartLine?.merchandise?.image?.src ?? undefined,
+		  variant_id: event?.data?.cartLine?.merchandise?.id ?? undefined,
+		  variant: event?.data?.cartLine?.merchandise?.title ?? undefined,
+		  product_id: event?.data?.cartLine?.merchandise?.product?.id ?? undefined,
+		  item_name: event?.data?.cartLine?.merchandise?.product?.title ?? undefined,
+		  price: event?.data?.cartLine?.merchandise?.price?.amount ?? undefined,
+		  quantity: event?.data?.cartLine?.quantity ?? undefined
+		}]
+	  }, commonCustomerDetails(event, init), pageDetails(event?.context));
+  }
+  else{
+	sendToParent('gtm_add_to_cart', {
+		event_id_add_to_cart: event?.id,
+		event_category: 'ecommerce',
+		event_timestamp: event?.timestamp
+	  }, {
+		currency: event?.data?.cartLine?.merchandise?.price?.currencyCode ?? undefined,
+		value: event?.data?.cartLine?.merchandise?.price?.amount ?? undefined,
+		items: [{
+		  item_category: event?.data?.cartLine?.merchandise?.product?.type ?? undefined,
+		  item_brand: event?.data?.cartLine?.merchandise?.product?.vendor ?? undefined,
+		  item_id: event?.data?.cartLine?.merchandise?.sku === '' || event?.data?.cartLine?.merchandise?.sku == null ? event?.data?.cartLine?.merchandise?.id : event?.data?.cartLine?.merchandise?.sku,
+		  image: event?.data?.cartLine?.merchandise?.image?.src ?? undefined,
+		  variant_id: event?.data?.cartLine?.merchandise?.id ?? undefined,
+		  variant: event?.data?.cartLine?.merchandise?.title ?? undefined,
+		  product_id: event?.data?.cartLine?.merchandise?.product?.id ?? undefined,
+		  item_name: event?.data?.cartLine?.merchandise?.product?.title ?? undefined,
+		  price: event?.data?.cartLine?.merchandise?.price?.amount ?? undefined,
+		  quantity: event?.data?.cartLine?.quantity ?? undefined
+		}]
+	  }, commonCustomerDetails(event, init), pageDetails(event?.context));
+  }
+  });
 
 analytics.subscribe('product_removed_from_cart', async (event) => {
   sendToParent('gtm_remove_from_cart', {
-    event_id: event?.id,
+    event_id_remove_from_cart: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -231,7 +267,7 @@ analytics.subscribe('product_removed_from_cart', async (event) => {
 
 analytics.subscribe('cart_viewed', async (event) => {
   sendToParent('gtm_view_cart', {
-    event_id: event?.id,
+    event_id_view_cart: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -259,7 +295,7 @@ analytics.subscribe('checkout_started', (event) => {
   }
   
   pushToDataLayer('gtm_begin_checkout', {
-    event_id: event?.id,
+    event_id_begin_checkout: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -283,7 +319,7 @@ analytics.subscribe('checkout_started', (event) => {
       price: item?.variant?.price?.amount ?? undefined,
       coupon: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.title : undefined,
       discount: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.amount?.amount : undefined,
-      selling_plan_allocation: item?.sellingPlanAllocation ?? undefined,
+      selling_plan_allocation: item?.sellingPlanAllocation?.sellingPlan?.name ?? undefined,
     }))
   }, {
     id: init?.data?.customer?.id ?? undefined,
@@ -308,7 +344,7 @@ analytics.subscribe('checkout_completed', (event) => {
   }
   
   pushToDataLayer('gtm_purchase', {
-    event_id: event?.id,
+    event_id_purchase: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -336,7 +372,7 @@ analytics.subscribe('checkout_completed', (event) => {
       price: item?.variant?.price?.amount ?? undefined,
       coupon: (item?.discountAllocations && item.discountAllocations.length > 0) ? item.discountAllocations[0]?.discountApplication?.title : undefined,
       discount: (item?.discountAllocations && item.discountAllocations.length > 0) ? item.discountAllocations[0]?.amount?.amount : undefined,
-      selling_plan_allocation: item?.sellingPlanAllocation ?? undefined,
+      selling_plan_allocation: item?.sellingPlanAllocation?.sellingPlan?.name ?? undefined,
     }))
   }, {
     id: event?.data?.checkout?.order?.customer?.id ?? undefined,
@@ -362,7 +398,7 @@ analytics.subscribe('payment_info_submitted', (event) => {
   }
   
   pushToDataLayer('gtm_add_payment_info', {
-    event_id: event?.id,
+    event_id_add_payment_info: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -386,7 +422,7 @@ analytics.subscribe('payment_info_submitted', (event) => {
       price: item?.variant?.price?.amount ?? undefined,
       coupon: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.title : undefined,
       discount: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.amount?.amount : undefined,
-      selling_plan_allocation: item?.sellingPlanAllocation ?? undefined,
+      selling_plan_allocation: item?.sellingPlanAllocation?.sellingPlan?.name ?? undefined,
     }))
   }, {
     id: init?.data?.customer?.id ?? undefined,
@@ -411,7 +447,7 @@ analytics.subscribe('checkout_contact_info_submitted', (event) => {
   }
   
   pushToDataLayer('gtm_contact_info', {
-    event_id: event?.id,
+    event_id_contact_info: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -435,7 +471,7 @@ analytics.subscribe('checkout_contact_info_submitted', (event) => {
       price: item?.variant?.price?.amount ?? undefined,
       coupon: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.title : undefined,
       discount: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.amount?.amount : undefined,
-      selling_plan_allocation: item?.sellingPlanAllocation ?? undefined,
+      selling_plan_allocation: item?.sellingPlanAllocation?.sellingPlan?.name ?? undefined,
     }))
   }, {
     id: init?.data?.customer?.id ?? undefined,
@@ -460,7 +496,7 @@ analytics.subscribe('checkout_shipping_info_submitted', (event) => {
   }
   
   pushToDataLayer('gtm_add_shipping_info', {
-    event_id: event?.id,
+    event_id_add_shipping_info: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -484,7 +520,7 @@ analytics.subscribe('checkout_shipping_info_submitted', (event) => {
       price: item?.variant?.price?.amount ?? undefined,
       coupon: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.title : undefined,
       discount: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.amount?.amount : undefined,
-      selling_plan_allocation: item?.sellingPlanAllocation ?? undefined,
+      selling_plan_allocation: item?.sellingPlanAllocation?.sellingPlan?.name ?? undefined,
     }))
   }, {
     id: init?.data?.customer?.id ?? undefined,
@@ -509,7 +545,7 @@ analytics.subscribe('checkout_address_info_submitted', (event) => {
   }
   
   pushToDataLayer('gtm_add_address_info', {
-    event_id: event?.id,
+    event_id_add_address_info: event?.id,
     event_category: 'ecommerce',
     event_timestamp: event?.timestamp
   }, {
@@ -533,7 +569,7 @@ analytics.subscribe('checkout_address_info_submitted', (event) => {
       price: item?.variant?.price?.amount ?? undefined,
       coupon: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.title : undefined,
       discount: (item?.discountApplications && item.discountApplications.length > 0) ? item.discountApplications[0]?.amount?.amount : undefined,
-      selling_plan_allocation: item?.sellingPlanAllocation ?? undefined,
+      selling_plan_allocation: item?.sellingPlanAllocation?.sellingPlan?.name ?? undefined,
     }))
   }, {
     id: init?.data?.customer?.id ?? undefined,
@@ -553,17 +589,27 @@ analytics.subscribe('checkout_address_info_submitted', (event) => {
 });
 
 analytics.subscribe('alert_displayed', (event) => {
-  if (GTM_LOADED === 0) {
-    loadGTM();
+  if(init?.context?.document?.location?.href.indexOf('/checkouts/')!== -1){
+	  if(GTM_LOADED === 0) {
+		loadGTM();
+	  }
+	  pushToDataLayer('gtm_display_alert', {
+		event_id_display_alert: event?.id,
+		event_category: 'alert',
+		event_timestamp: event?.timestamp,
+		alert_message: event?.data?.alert?.message ?? undefined,
+		alert_target: event?.data?.alert?.target ?? undefined,
+		alert_type: event?.data?.alert?.type ?? undefined,
+	  },{}, commonCustomerDetails(event, init), pageDetails(event?.context));
+  }else{
+    sendToParent('gtm_display_alert', {
+		event_id_display_alert: event?.id,
+		event_category: 'alert',
+		event_timestamp: event?.timestamp,
+		alert_message: event?.data?.alert?.message ?? undefined,
+		alert_target: event?.data?.alert?.target ?? undefined,
+		alert_type: event?.data?.alert?.type ?? undefined,
+	  },{}, commonCustomerDetails(event, init), pageDetails(event?.context));
   }
-  
-  pushToDataLayer('gtm_display_alert', {
-    event_id: event?.id,
-    event_category: 'alert',
-    event_timestamp: event?.timestamp,
-    alert_message: event?.data?.alert?.message ?? undefined,
-    alert_target: event?.data?.alert?.target ?? undefined,
-    alert_type: event?.data?.alert?.type ?? undefined,
-  },{}, commonCustomerDetails(event, init), pageDetails(event?.context));
-
 });
+
