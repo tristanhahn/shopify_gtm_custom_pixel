@@ -613,3 +613,17 @@ analytics.subscribe('alert_displayed', (event) => {
   }
 });
 
+analytics.subscribe('form_submitted', (event) => {
+  pushToDataLayer('gtm_form_submit', {
+    form_submit_event_id: event?.id,
+    event_category: 'form',
+    event_timestamp: event?.timestamp,
+    form_id: event?.data?.element?.id ?? undefined,
+    form_action: event?.data?.element?.action ?? undefined,
+  },{}, 
+  {
+	email:  event?.data?.element?.elements
+		.filter((item) => /email/i.test(item.id) || /email/i.test(item.name))
+		.map((item) => item.value)[0]
+  }, pageDetails(event?.context));
+});
