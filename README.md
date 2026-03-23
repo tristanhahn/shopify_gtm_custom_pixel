@@ -16,6 +16,7 @@
                   if (event.data && event.data.event_name === "gtm_custom_pixel_event" && event.data.json) {
                       try {
                           var eventData = JSON.parse(event.data.json);
+                          window.dataLayer = window.dataLayer || [];
       
                           // If ecommerce data exists, clear previous ecommerce data
                           if (eventData.ecommerce && Object.keys(eventData.ecommerce).length > 0) {
